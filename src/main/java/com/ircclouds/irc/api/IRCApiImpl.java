@@ -633,7 +633,10 @@ public class IRCApiImpl implements IRCApi
 		}
 		catch (SocketException aExc)
 		{
-			((IRCStateImpl) this.state).setConnected(false);
+			if (this.state instanceof IRCStateImpl)
+			{
+				((IRCStateImpl) this.state).setConnected(false);
+			}
 			dispatchError(aExc);
 			tryInvokeCallback(aCallback, aDirty, aExc);
 		}
