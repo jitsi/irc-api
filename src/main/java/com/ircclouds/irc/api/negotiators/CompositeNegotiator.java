@@ -22,14 +22,13 @@ import org.slf4j.LoggerFactory;
 /**
  * Composite Negotiator. A composite negotiator that will handle negotiator for
  * a provided list of capabilities.
- *
+ * <p>
  * The composite negotiator is a stateful negotiator that will start with a
  * clean state upon initiation.
  *
- * TODO add special exception to signal for connection abort. This may be used by SASL capability to signal to abort connection if sasl is NAKed.
- *
  * @author Danny van Heumen
  */
+// TODO add special exception to signal for connection abort. This may be used by SASL capability to signal to abort connection if sasl is NAKed.
 public class CompositeNegotiator implements CapabilityNegotiator, IMessageListener
 {
 	/**
@@ -37,9 +36,9 @@ public class CompositeNegotiator implements CapabilityNegotiator, IMessageListen
 	 */
 	private static final Logger LOG = LoggerFactory.getLogger(CompositeNegotiator.class);
 
-	private static final Pattern CAPABILITY_LS = Pattern.compile("\\sCAP\\s+([^\\s]+)\\s+LS\\s+:([\\w-_]+(?:\\s+[\\w-_]+)*)\\s*$", 0);
-	private static final Pattern CAPABILITY_ACK = Pattern.compile("\\sCAP\\s+([^\\s]+)\\s+ACK\\s+:([\\w-_]+(?:\\s+[\\w-_]+)*)\\s*$", 0);
-	private static final Pattern CAPABILITY_NAK = Pattern.compile("\\sCAP\\s+([^\\s]+)\\s+NAK");
+	private static final Pattern CAPABILITY_LS = Pattern.compile("\\sCAP\\s+(\\S+)\\s+LS\\s+:([\\w-_/.]+(?:\\s+[\\w-_/.]+)*)\\s*$", 0);
+	private static final Pattern CAPABILITY_ACK = Pattern.compile("\\sCAP\\s+(\\S+)\\s+ACK\\s+:([\\w-_/.]+(?:\\s+[\\w-_/.]+)*)\\s*$", 0);
+	private static final Pattern CAPABILITY_NAK = Pattern.compile("\\sCAP\\s+(\\S+)\\s+NAK");
 
 	/**
 	 * List of requested capabilities.
@@ -161,7 +160,7 @@ public class CompositeNegotiator implements CapabilityNegotiator, IMessageListen
 		}
 		if (LOG.isDebugEnabled())
 		{
-			LOG.debug("SERVER: {}", msg.asRaw());
+			LOG.debug("SERVER ({}): {}", msg.getClass().getName(), msg.asRaw());
 		}
 		// FIXME handle server PING messages ourselves
 		if (msg instanceof ServerNumericMessage)
@@ -192,6 +191,7 @@ public class CompositeNegotiator implements CapabilityNegotiator, IMessageListen
 				if (request.isEmpty())
 				{
 					// there's nothing left to request, so finish capability negotiation
+					LOG.debug("No capabilities remaining to be requested. Ending negotiation.");
 					endNegotiation();
 				}
 				else

@@ -283,6 +283,20 @@ public class CompositeNegotiatorTest
 		assertTrue(parsed.get(1).isMandatory());
 	}
 
+	@Test
+	public void testParseResponseCapLongExistingIRCServerResponse() {
+		LinkedList<CompositeNegotiator.Cap> parsed = CompositeNegotiator.parseResponseCaps("account-notify account-tag away-notify batch cap-notify chghost draft/account-registration draft/channel-rename draft/chathistory draft/event-playback draft/languages draft/multiline draft/persistence draft/read-marker draft/relaymsg echo-message ergo.chat/nope extended-join extended-monitor invite-notify labeled-response message-tags multi-prefix sasl server-time setname userhost-in-names znc.in/playback znc.in/self-message");
+		assertEquals(29, parsed.size());
+		assertEquals("account-notify", parsed.get(0).getId());
+		assertTrue(parsed.get(0).isEnabled());
+		assertFalse(parsed.get(0).isRquiresAck());
+		assertFalse(parsed.get(0).isMandatory());
+		assertEquals("znc.in/self-message", parsed.get(28).getId());
+		assertTrue(parsed.get(1).isEnabled());
+		assertFalse(parsed.get(1).isRquiresAck());
+		assertFalse(parsed.get(1).isMandatory());
+	}
+
 	private Capability getCapability(final String id) {
 		return new Capability() {
 
