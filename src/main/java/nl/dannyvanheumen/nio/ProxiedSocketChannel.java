@@ -28,11 +28,9 @@ import java.util.*;
  * support for proxies. The implementation currently only supports
  * <em>blocking</em> behavior.
  *
- * TODO implement non-blocking implementation and option to switch (consisting
- * of non-blocking connect, read, write)
- *
  * @author Danny van Heumen
  */
+// TODO implement non-blocking implementation and option to switch (consisting of non-blocking connect, read, write)
 public class ProxiedSocketChannel extends SocketChannel
 {
 	/**
@@ -90,8 +88,7 @@ public class ProxiedSocketChannel extends SocketChannel
 	}
 
 	@Override
-	public SocketAddress getLocalAddress() throws IOException
-	{
+	public SocketAddress getLocalAddress() {
 		return this.socket.getLocalSocketAddress();
 	}
 
@@ -111,29 +108,29 @@ public class ProxiedSocketChannel extends SocketChannel
 	@Override
 	public <T> T getOption(final SocketOption<T> option) throws IOException
 	{
-		if (StandardSocketOptions.SO_KEEPALIVE.equals(option))
+		if (option == StandardSocketOptions.SO_KEEPALIVE)
 		{
-			return (T) StandardSocketOptions.SO_KEEPALIVE.type().cast(this.socket.getKeepAlive());
+			return option.type().cast(this.socket.getKeepAlive());
 		}
-		else if (StandardSocketOptions.SO_RCVBUF.equals(option))
+		else if (option == StandardSocketOptions.SO_RCVBUF)
 		{
-			return (T) StandardSocketOptions.SO_RCVBUF.type().cast(this.socket.getReceiveBufferSize());
+			return option.type().cast(this.socket.getReceiveBufferSize());
 		}
-		else if (StandardSocketOptions.SO_SNDBUF.equals(option))
+		else if (option == StandardSocketOptions.SO_SNDBUF)
 		{
-			return (T) StandardSocketOptions.SO_SNDBUF.type().cast(this.socket.getSendBufferSize());
+			return option.type().cast(this.socket.getSendBufferSize());
 		}
-		else if (StandardSocketOptions.SO_REUSEADDR.equals(option))
+		else if (option == StandardSocketOptions.SO_REUSEADDR)
 		{
-			return (T) StandardSocketOptions.SO_REUSEADDR.type().cast(this.socket.getReuseAddress());
+			return option.type().cast(this.socket.getReuseAddress());
 		}
-		else if (StandardSocketOptions.TCP_NODELAY.equals(option))
+		else if (option == StandardSocketOptions.TCP_NODELAY)
 		{
-			return (T) StandardSocketOptions.TCP_NODELAY.type().cast(this.socket.getTcpNoDelay());
+			return option.type().cast(this.socket.getTcpNoDelay());
 		}
-		else if (StandardSocketOptions.SO_LINGER.equals(option))
+		else if (option == StandardSocketOptions.SO_LINGER)
 		{
-			return (T) StandardSocketOptions.SO_LINGER.type().cast(this.socket.getSoLinger());
+			return option.type().cast(this.socket.getSoLinger());
 		}
 		throw new IllegalArgumentException("Unsupported option specified.");
 	}
@@ -142,36 +139,29 @@ public class ProxiedSocketChannel extends SocketChannel
 	public <T> SocketChannel setOption(final SocketOption<T> option, final T value)
 			throws IOException
 	{
-		if (StandardSocketOptions.SO_KEEPALIVE.equals(option))
+		if (option == StandardSocketOptions.SO_KEEPALIVE)
 		{
-			final Class<Boolean> keepaliveType = StandardSocketOptions.SO_KEEPALIVE.type();
-			this.socket.setKeepAlive(keepaliveType.cast(value));
+			this.socket.setKeepAlive(StandardSocketOptions.SO_KEEPALIVE.type().cast(value));
 		}
-		else if (StandardSocketOptions.SO_RCVBUF.equals(option))
+		else if (option == StandardSocketOptions.SO_RCVBUF)
 		{
-			final Class<Integer> rcvbufType = StandardSocketOptions.SO_RCVBUF.type();
-			this.socket.setReceiveBufferSize(rcvbufType.cast(value));
+			this.socket.setReceiveBufferSize(StandardSocketOptions.SO_RCVBUF.type().cast(value));
 		}
-		else if (StandardSocketOptions.SO_SNDBUF.equals(option)) {
-			final Class<Integer> sndbufType = StandardSocketOptions.SO_SNDBUF.type();
-			this.socket.setSendBufferSize(sndbufType.cast(value));
+		else if (option == StandardSocketOptions.SO_SNDBUF) {
+			this.socket.setSendBufferSize(StandardSocketOptions.SO_SNDBUF.type().cast(value));
 		}
-		else if (StandardSocketOptions.SO_REUSEADDR.equals(option))
+		else if (option == StandardSocketOptions.SO_REUSEADDR)
 		{
-			final Class<Boolean> reuseType = StandardSocketOptions.SO_REUSEADDR.type();
-			this.socket.setReuseAddress(reuseType.cast(value));
+			this.socket.setReuseAddress(StandardSocketOptions.SO_REUSEADDR.type().cast(value));
 		}
-		else if (StandardSocketOptions.TCP_NODELAY.equals(option))
+		else if (option == StandardSocketOptions.TCP_NODELAY)
 		{
-			final Class<Boolean> nodelayType = StandardSocketOptions.TCP_NODELAY.type();
-			this.socket.setTcpNoDelay(nodelayType.cast(value));
+			this.socket.setTcpNoDelay(StandardSocketOptions.TCP_NODELAY.type().cast(value));
 		}
-		else if (StandardSocketOptions.SO_LINGER.equals(option))
+		else if (option == StandardSocketOptions.SO_LINGER)
 		{
-			final Class<Integer> lingerType = StandardSocketOptions.SO_LINGER.type();
-			final Integer lingerValue = lingerType.cast(value);
-			final boolean enabled = lingerValue >= 0;
-			this.socket.setSoLinger(enabled, lingerValue);
+			final int lingerValue = StandardSocketOptions.SO_LINGER.type().cast(value);
+			this.socket.setSoLinger(lingerValue >= 0, lingerValue);
 		}
 		throw new IllegalArgumentException("Unsupported option specified.");
 	}
@@ -218,17 +208,16 @@ public class ProxiedSocketChannel extends SocketChannel
 	}
 
 	@Override
-	public boolean finishConnect() throws IOException
-	{
+	public boolean finishConnect() {
 		return this.socket.isConnected();
 	}
 
 	@Override
-	public SocketAddress getRemoteAddress() throws IOException
-	{
+	public SocketAddress getRemoteAddress() {
 		return this.socket.getRemoteSocketAddress();
 	}
 
+	@SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
 	@Override
 	public int read(final ByteBuffer dst) throws IOException
 	{
@@ -241,7 +230,7 @@ public class ProxiedSocketChannel extends SocketChannel
 
 	/**
 	 * Read from provided input stream in blocking fashion.
-	 *
+	 * <p>
 	 * NOTE: assumes that calling thread is already <em>synchronized</em> on
 	 * input stream!
 	 *
@@ -261,6 +250,7 @@ public class ProxiedSocketChannel extends SocketChannel
 		return size;
 	}
 
+	@SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
 	@Override
 	public long read(final ByteBuffer[] dsts, final int offset, final int length)
 			throws IOException
@@ -274,7 +264,7 @@ public class ProxiedSocketChannel extends SocketChannel
 
 	/**
 	 * Read from provided input stream in blocking fashion.
-	 *
+	 * <p>
 	 * NOTE: assumes that calling thread is already <em>synchronized</em> on
 	 * input stream!
 	 *
@@ -283,9 +273,10 @@ public class ProxiedSocketChannel extends SocketChannel
 	 * @param offset the offset for first available buffer
 	 * @param length the number of buffers to use
 	 * @return returns number of bytes read
-	 * @throws IOException
+	 * @throws IOException Throws in case of failure to read from input stream.
 	 */
-	private long readBlocking(final InputStream input, final ByteBuffer[] dsts, final int offset, final int length) throws IOException
+	private long readBlocking(final InputStream input, final ByteBuffer[] dsts, final int offset, final int length)
+			throws IOException
 	{
 		int total = 0;
 		for (int i = offset; i < offset + length; i++)
@@ -310,6 +301,7 @@ public class ProxiedSocketChannel extends SocketChannel
 		return total;
 	}
 
+	@SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
 	@Override
 	public int write(final ByteBuffer src) throws IOException
 	{
@@ -322,7 +314,7 @@ public class ProxiedSocketChannel extends SocketChannel
 
 	/**
 	 * Write to provided output stream in blocking fashion.
-	 *
+	 * <p>
 	 * NOTE: assumes that calling thread is already synchronized on output
 	 * stream!
 	 *
@@ -339,6 +331,7 @@ public class ProxiedSocketChannel extends SocketChannel
 		return buffer.length;
 	}
 
+	@SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
 	@Override
 	public long write(final ByteBuffer[] srcs, final int offset, final int length)
 			throws IOException
@@ -352,7 +345,7 @@ public class ProxiedSocketChannel extends SocketChannel
 
 	/**
 	 * Write to provided output stream in blocking fashion.
-	 *
+	 * <p>
 	 * NOTE: assumes that calling thread is already <em>synchronized</em> on
 	 * output stream!
 	 *
@@ -380,8 +373,7 @@ public class ProxiedSocketChannel extends SocketChannel
 	}
 
 	@Override
-	protected void implConfigureBlocking(final boolean block) throws IOException
-	{
+	protected void implConfigureBlocking(final boolean block) {
 		if (block)
 		{
 			return;
