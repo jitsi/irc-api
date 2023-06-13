@@ -2,9 +2,9 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.jitsi</groupId>
+	<groupId>com.ircclouds.irc</groupId>
 	<artifactId>irc-api</artifactId>
-	<version>1.0-0015-jitsi-2-SNAPSHOT</version>
+	<version>1.0-0016-SNAPSHOT</version>
 	<packaging>bundle</packaging>
 
 	<name>IRC API</name>
