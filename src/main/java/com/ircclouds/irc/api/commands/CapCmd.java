@@ -5,6 +5,5 @@ package com.ircclouds.irc.api.commands;
  *
  * @author Danny van Heumen
  */
-public abstract class CapCmd implements ICommand
-{
+public abstract class CapCmd implements ICommand {
 }

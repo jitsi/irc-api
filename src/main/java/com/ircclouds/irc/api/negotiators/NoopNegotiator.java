@@ -11,20 +11,17 @@ import com.ircclouds.irc.api.domain.messages.interfaces.*;
  *
  * @author Danny van Heumen
  */
-public class NoopNegotiator implements CapabilityNegotiator
-{
+public class NoopNegotiator implements CapabilityNegotiator {
 
-	/**
-	 * The CAP negotiation initialization command immediately ends negotiation.
-	 */
-	@Override
-	public CapCmd initiate(final IRCApi irc)
-	{
-		return new CapEndCmd();
-	}
+    /**
+     * The CAP negotiation initialization command immediately ends negotiation.
+     */
+    @Override
+    public CapCmd initiate(final IRCApi irc) {
+        return new CapEndCmd();
+    }
 
-	@Override
-	public void onMessage(final IMessage aMessage)
-	{
-	}
+    @Override
+    public void onMessage(final IMessage aMessage) {
+    }
 }

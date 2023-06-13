@@ -5,12 +5,10 @@ package com.ircclouds.irc.api.commands;
  *
  * @author Danny van Heumen
  */
-public class CapLsCmd extends CapCmd
-{
+public class CapLsCmd extends CapCmd {
 
-	@Override
-	public String asString()
-	{
-		return "CAP LS";
-	}
+    @Override
+    public String asString() {
+        return "CAP LS";
+    }
 }

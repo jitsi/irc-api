@@ -12,162 +12,130 @@ import com.ircclouds.irc.api.filters.*;
 import com.ircclouds.irc.api.listeners.*;
 import com.ircclouds.irc.api.state.*;
 
-public abstract class AbstractIRCSession implements IIRCSession
-{
-	private final IMessageDispatcher dispatcher = new MessageDispatcherImpl();
-	private final ICommandServer cmdServ;
-	private final IMessageReader reader;
-	private final AbstractApiDaemon daemon;
-	private IConnection conn;
-	private Callback<IIRCState> callback;
+public abstract class AbstractIRCSession implements IIRCSession {
+    private final IMessageDispatcher dispatcher = new MessageDispatcherImpl();
+    private final ICommandServer cmdServ;
+    private final IMessageReader reader;
+    private final AbstractApiDaemon daemon;
+    private IConnection conn;
+    private Callback<IIRCState> callback;
 
-	public AbstractIRCSession()
-	{
-		cmdServ = new AbstractCommandServerImpl()
-		{
-			@Override
-			public IConnection getConnection()
-			{
-				return conn;
-			}
-		};
-		
-		reader = new AbstractMessageReader()
-		{
-			@Override
-			protected IRCServerOptions getIRCServerOptions()
-			{
-				return AbstractIRCSession.this.getIRCServerOptions();
-			}
+    public AbstractIRCSession() {
+        cmdServ = new AbstractCommandServerImpl() {
+            @Override
+            public IConnection getConnection() {
+                return conn;
+            }
+        };
 
-			@Override
-			public IConnection getConnection()
-			{
-				return conn;
-			}
-		};
-		
-		daemon = new AbstractApiDaemon(reader, dispatcher)
-		{
-			@Override
-			protected void onExit()
-			{
-				try
-				{
-					close();
-				}
-				catch (IOException aExc)
-				{
-					throw new RuntimeException(aExc);
-				}
-			}
+        reader = new AbstractMessageReader() {
+            @Override
+            protected IRCServerOptions getIRCServerOptions() {
+                return AbstractIRCSession.this.getIRCServerOptions();
+            }
 
-			@Override
-			protected IMessageFilter getMessageFilter()
-			{
-				return AbstractIRCSession.this.getMessageFilter();
-			}
+            @Override
+            public IConnection getConnection() {
+                return conn;
+            }
+        };
 
-			@Override
-			protected void signalExceptionToApi(Exception aExc)
-			{
-				callback.onFailure(aExc);
-			}
-		};
-	}
+        daemon = new AbstractApiDaemon(reader, dispatcher) {
+            @Override
+            protected void onExit() {
+                try {
+                    close();
+                } catch (IOException aExc) {
+                    throw new RuntimeException(aExc);
+                }
+            }
 
-	public void execute(ICommand aCommand) throws IOException
-	{
-		cmdServ.execute(aCommand);
-	}
+            @Override
+            protected IMessageFilter getMessageFilter() {
+                return AbstractIRCSession.this.getMessageFilter();
+            }
 
-	@Override
-	public void addListeners(MESSAGE_VISIBILITY aListenerLevel, IMessageListener... aListeners)
-	{
-		for (IMessageListener _listener : aListeners)
-		{
-			dispatcher.register(_listener, aListenerLevel);
-		}
-	}
-	
-	@Override
-	public ICommandServer getCommandServer()
-	{
-		return cmdServ;
-	}
+            @Override
+            protected void signalExceptionToApi(Exception aExc) {
+                callback.onFailure(aExc);
+            }
+        };
+    }
 
-	@Override
-	public void removeListener(IMessageListener aListener)
-	{
-		dispatcher.unregister(aListener);
-	}
+    public void execute(ICommand aCommand) throws IOException {
+        cmdServ.execute(aCommand);
+    }
 
-	@Override
-	public boolean open(IRCServer aServer, Callback<IIRCState> aCallback) throws IOException
-	{
-		callback = aCallback;
-		
-		if (!aServer.isSSL())
-		{
-			conn = new SocketChannelConnection();
-		}
-		else
-		{
-			conn = new SSLSocketChannelConnection();
-		}
-		
-		SSLContext _ctx = null;
-		if (aServer instanceof SecureIRCServer)
-		{
-			_ctx = ((SecureIRCServer) aServer).getSSLContext();
-		}
-		
-		if (conn.open(aServer.getHostname(), aServer.getPort(), _ctx, aServer.getProxy(), aServer.isResolveByProxy()))
-		{
-			if (!daemon.isAlive())
-			{
-				daemon.start();	
-			}
-			
-			return true;
-		}
+    @Override
+    public void addListeners(MESSAGE_VISIBILITY aListenerLevel, IMessageListener... aListeners) {
+        for (IMessageListener _listener : aListeners) {
+            dispatcher.register(_listener, aListenerLevel);
+        }
+    }
 
-		return false;
-	}
+    @Override
+    public ICommandServer getCommandServer() {
+        return cmdServ;
+    }
 
-	@Override
-	public void close() throws IOException
-	{
-		conn.close();
-		
-		reader.reset();
-	}
+    @Override
+    public void removeListener(IMessageListener aListener) {
+        dispatcher.unregister(aListener);
+    }
 
-	protected abstract IRCServerOptions getIRCServerOptions();
+    @Override
+    public boolean open(IRCServer aServer, Callback<IIRCState> aCallback) throws IOException {
+        callback = aCallback;
 
-	@Override
-	public void dispatchClientError(final Exception e)
-	{
-		final IMessageDispatcher currentDispatcher = this.dispatcher;
-		new Thread()
-		{
+        if (!aServer.isSSL()) {
+            conn = new SocketChannelConnection();
+        } else {
+            conn = new SSLSocketChannelConnection();
+        }
 
-			@Override
-			public void run()
-			{
-				final ClientErrorMessage errorMsg = new ClientErrorMessage(e);
-				currentDispatcher.dispatch(errorMsg, TargetListeners.ALL);
-			}
-		}.start();
-	}
+        SSLContext _ctx = null;
+        if (aServer instanceof SecureIRCServer) {
+            _ctx = ((SecureIRCServer) aServer).getSSLContext();
+        }
 
-	@Override
-	public void secureConnection(final SSLContext aContext, final String aHostname, final int aPort) throws SSLException
-	{
-		if (!(this.conn instanceof SocketChannelConnection))
-		{
-			throw new IllegalArgumentException("unsupported connection type in use");
-		}
-		this.conn = new SSLSocketChannelConnection((SocketChannelConnection) this.conn, aContext, aHostname, aPort);
-	}
+        if (conn.open(aServer.getHostname(), aServer.getPort(), _ctx, aServer.getProxy(), aServer.isResolveByProxy())) {
+            if (!daemon.isAlive()) {
+                daemon.start();
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public void close() throws IOException {
+        conn.close();
+
+        reader.reset();
+    }
+
+    protected abstract IRCServerOptions getIRCServerOptions();
+
+    @Override
+    public void dispatchClientError(final Exception e) {
+        final IMessageDispatcher currentDispatcher = this.dispatcher;
+        new Thread() {
+
+            @Override
+            public void run() {
+                final ClientErrorMessage errorMsg = new ClientErrorMessage(e);
+                currentDispatcher.dispatch(errorMsg, TargetListeners.ALL);
+            }
+        }.start();
+    }
+
+    @Override
+    public void secureConnection(final SSLContext aContext, final String aHostname, final int aPort) throws SSLException {
+        if (!(this.conn instanceof SocketChannelConnection)) {
+            throw new IllegalArgumentException("unsupported connection type in use");
+        }
+        this.conn = new SSLSocketChannelConnection((SocketChannelConnection) this.conn, aContext, aHostname, aPort);
+    }
 }

@@ -1,25 +1,21 @@
 package com.ircclouds.irc.api.commands;
 
 
-public class QuitCmd implements ICommand
-{
-	private static final String QUIT_ID = "QUIT";
+public class QuitCmd implements ICommand {
+    private static final String QUIT_ID = "QUIT";
 
-	private String quitMsg;
+    private String quitMsg;
 
-	public QuitCmd()
-	{
-		quitMsg = "";
-	}	
-	
-	public QuitCmd(String aQuitMsg)
-	{
-		quitMsg = aQuitMsg;
-	}
+    public QuitCmd() {
+        quitMsg = "";
+    }
 
-	@Override
-	public String asString()
-	{
-		return QUIT_ID + " :" + quitMsg;
-	}
+    public QuitCmd(String aQuitMsg) {
+        quitMsg = aQuitMsg;
+    }
+
+    @Override
+    public String asString() {
+        return QUIT_ID + " :" + quitMsg;
+    }
 }

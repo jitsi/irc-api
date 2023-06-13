@@ -6,32 +6,30 @@ import com.ircclouds.irc.api.*;
 import com.ircclouds.irc.api.domain.*;
 
 /**
- * This interface represents a view about the currently established IRC connection state, and allows retrieval 
+ * This interface represents a view about the currently established IRC connection state, and allows retrieval
  * of various IRC server options like channels modes, user statuses, and more, once
  * {@link IRCApiImpl#IRCApiImpl(Boolean)} is set to true.
- * 
- * @author miguel@lebane.se
  *
+ * @author miguel@lebane.se
  */
-public interface IIRCState
-{
-	String getNickname();
+public interface IIRCState {
+    String getNickname();
 
-	List<String> getAltNicks();
+    List<String> getAltNicks();
 
-	String getRealname();
+    String getRealname();
 
-	String getIdent();
+    String getIdent();
 
-	List<IRCChannel> getChannels();
+    List<IRCChannel> getChannels();
 
-	IRCChannel getChannelByName(String aChannelName);
+    IRCChannel getChannelByName(String aChannelName);
 
-	IRCServer getServer();
+    IRCServer getServer();
 
-	IRCServerOptions getServerOptions();
-	
-	boolean isConnected();
-	
-	IIRCState getPrevious();
+    IRCServerOptions getServerOptions();
+
+    boolean isConnected();
+
+    IIRCState getPrevious();
 }

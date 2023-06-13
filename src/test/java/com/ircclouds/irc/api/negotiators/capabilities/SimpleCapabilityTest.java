@@ -3,6 +3,7 @@ package com.ircclouds.irc.api.negotiators.capabilities;
 import com.ircclouds.irc.api.negotiators.api.Relay;
 import org.junit.Before;
 import org.junit.Test;
+
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
@@ -10,54 +11,54 @@ import static org.mockito.Mockito.mock;
  * @author Danny van Heumen
  */
 public class SimpleCapabilityTest {
-	
-	public SimpleCapabilityTest() {
-	}
-	
-	@Before
-	public void setUp() {
-	}
 
-	@Test(expected = NullPointerException.class)
-	public void testConstructingNullCapabilityId() {
-		new SimpleCapability(null);
-	}
+    public SimpleCapabilityTest() {
+    }
 
-	@Test(expected = NullPointerException.class)
-	public void testConstructingNullCapabilityIdEnabled() {
-		new SimpleCapability(null, true);
-	}
+    @Before
+    public void setUp() {
+    }
 
-	@Test(expected = NullPointerException.class)
-	public void testConstructingNullCapabilityIdDisabled() {
-		new SimpleCapability(null, false);
-	}
+    @Test(expected = NullPointerException.class)
+    public void testConstructingNullCapabilityId() {
+        new SimpleCapability(null);
+    }
 
-	@Test
-	public void testSimpleCapability() {
-		SimpleCapability cap = new SimpleCapability("away-notify");
-		assertTrue(cap.enable());
-		assertEquals("away-notify", cap.getId());
-	}
+    @Test(expected = NullPointerException.class)
+    public void testConstructingNullCapabilityIdEnabled() {
+        new SimpleCapability(null, true);
+    }
 
-	@Test
-	public void testSimpleCapabilityEnabled() {
-		SimpleCapability cap = new SimpleCapability("away-notify", true);
-		assertTrue(cap.enable());
-		assertEquals("away-notify", cap.getId());
-	}
+    @Test(expected = NullPointerException.class)
+    public void testConstructingNullCapabilityIdDisabled() {
+        new SimpleCapability(null, false);
+    }
 
-	@Test
-	public void testSimpleCapabilityDisabled() {
-		SimpleCapability cap = new SimpleCapability("away-notify", false);
-		assertFalse(cap.enable());
-		assertEquals("away-notify", cap.getId());
-	}
+    @Test
+    public void testSimpleCapability() {
+        SimpleCapability cap = new SimpleCapability("away-notify");
+        assertTrue(cap.enable());
+        assertEquals("away-notify", cap.getId());
+    }
 
-	@Test
-	public void testSimpleCapabilityConversation() {
-		Relay relay = mock(Relay.class);
-		SimpleCapability cap = new SimpleCapability("away-notify");
-		assertFalse(cap.converse(relay, null));
-	}
+    @Test
+    public void testSimpleCapabilityEnabled() {
+        SimpleCapability cap = new SimpleCapability("away-notify", true);
+        assertTrue(cap.enable());
+        assertEquals("away-notify", cap.getId());
+    }
+
+    @Test
+    public void testSimpleCapabilityDisabled() {
+        SimpleCapability cap = new SimpleCapability("away-notify", false);
+        assertFalse(cap.enable());
+        assertEquals("away-notify", cap.getId());
+    }
+
+    @Test
+    public void testSimpleCapabilityConversation() {
+        Relay relay = mock(Relay.class);
+        SimpleCapability cap = new SimpleCapability("away-notify");
+        assertFalse(cap.converse(relay, null));
+    }
 }

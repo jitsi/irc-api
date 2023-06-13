@@ -5,11 +5,9 @@ import com.ircclouds.irc.api.domain.messages.interfaces.*;
 
 /**
  * The IRC message listener interface that can be registered via {@link IRCApi}.
- * 
- * @author miguel@lebane.se
  *
+ * @author miguel@lebane.se
  */
-public interface IMessageListener
-{
-	void onMessage(IMessage aMessage);
+public interface IMessageListener {
+    void onMessage(IMessage aMessage);
 }

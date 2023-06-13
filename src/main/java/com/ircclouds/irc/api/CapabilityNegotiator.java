@@ -3,6 +3,8 @@ package com.ircclouds.irc.api;
 import com.ircclouds.irc.api.commands.*;
 import com.ircclouds.irc.api.listeners.*;
 
+import java.util.regex.Pattern;
+
 /**
  * IRC v3.1 capability negotiation.
  *
@@ -12,24 +14,26 @@ import com.ircclouds.irc.api.listeners.*;
  *
  * @author Danny van Heumen
  */
-public interface CapabilityNegotiator extends IMessageListener
-{
+public interface CapabilityNegotiator extends IMessageListener {
+    Pattern CAPABILITY_LS = Pattern.compile("\\sCAP\\s+(\\S+)\\s+LS\\s+:([\\w-_/.]+(?:\\s+[\\w-_/.]+)*)\\s*$", 0);
+    Pattern CAPABILITY_ACK = Pattern.compile("\\sCAP\\s+(\\S+)\\s+ACK\\s+:([\\w-_/.]+(?:\\s+[\\w-_/.]+)*)\\s*$", 0);
+    Pattern CAPABILITY_NAK = Pattern.compile("\\sCAP\\s+(\\S+)\\s+NAK");
 
-	/**
-	 * Initiate the negotiator with the provided irc instance.
-	 *
-	 * <p>
-	 * Initiate the negotiator and return the initial CAP negotiation message
-	 * that should be sent back to the server.
-	 * </p>
-	 *
-	 * <p>
-	 * The IRCApi instance should be stored for later use during negotiations in
-	 * order to respond to incoming CAP negoation messages.
-	 * </p>
-	 *
-	 * @param irc the current IRCApi instance
-	 * @return returns initialization command for CAP negotiation
-	 */
-	CapCmd initiate(IRCApi irc);
+    /**
+     * Initiate the negotiator with the provided irc instance.
+     *
+     * <p>
+     * Initiate the negotiator and return the initial CAP negotiation message
+     * that should be sent back to the server.
+     * </p>
+     *
+     * <p>
+     * The IRCApi instance should be stored for later use during negotiations in
+     * order to respond to incoming CAP negoation messages.
+     * </p>
+     *
+     * @param irc the current IRCApi instance
+     * @return returns initialization command for CAP negotiation
+     */
+    CapCmd initiate(IRCApi irc);
 }

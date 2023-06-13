@@ -2,10 +2,8 @@ package com.ircclouds.irc.api.domain.messages;
 
 import com.ircclouds.irc.api.domain.*;
 
-public class ChannelCTCPMsg extends ChannelPrivMsg
-{
-	public ChannelCTCPMsg(IRCUser aFromUser, String aText, String aChanName)
-	{
-		super(aFromUser, aText, aChanName);
-	}
+public class ChannelCTCPMsg extends ChannelPrivMsg {
+    public ChannelCTCPMsg(IRCUser aFromUser, String aText, String aChanName) {
+        super(aFromUser, aText, aChanName);
+    }
 }

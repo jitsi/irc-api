@@ -13,279 +13,229 @@ import org.slf4j.*;
 
 import nl.dannyvanheumen.nio.*;
 
-public class SSLSocketChannelConnection implements IConnection
-{
-	private static final Logger LOG = LoggerFactory.getLogger(SSLSocketChannelConnection.class);
-		
-	private SocketChannel sChannel;
-	private SSLEngine sslEngine;
+public class SSLSocketChannelConnection implements IConnection {
+    private static final Logger LOG = LoggerFactory.getLogger(SSLSocketChannelConnection.class);
 
-	private ByteBuffer appSendBuffer;
-	private ByteBuffer appRecvBuffer;
-	private ByteBuffer cipherSendBuffer;
-	private ByteBuffer cipherRecvBuffer;
+    private SocketChannel sChannel;
+    private SSLEngine sslEngine;
 
-	private HandshakeStatus hStatus;
-	private int remaingUnwraps;
+    private ByteBuffer appSendBuffer;
+    private ByteBuffer appRecvBuffer;
+    private ByteBuffer cipherSendBuffer;
+    private ByteBuffer cipherRecvBuffer;
 
-	public SSLSocketChannelConnection()
-	{
-	}
+    private HandshakeStatus hStatus;
+    private int remaingUnwraps;
 
-	/**
-	 * Convert existing SocketChannelConnection into
-	 * SSLSocketChannelConnection.
-	 *
-	 * @param aConnection Plain text socket channel connection.
-	 * @param aContext SSL Context, may be null to use default SSL context.
-	 * @param aHostname Host name.
-	 * @param aPort Port number.
-	 * @throws javax.net.ssl.SSLException Exception in case we fail to start
-	 * an SSL handshake.
-	 */
-	public SSLSocketChannelConnection(SocketChannelConnection aConnection, SSLContext aContext, String aHostname, int aPort) throws SSLException
-	{
-		sChannel = aConnection.getSocketChannel();
+    public SSLSocketChannelConnection() {
+    }
 
-		sslEngine  = aContext != null ? aContext.createSSLEngine(aHostname, aPort) : getDefaultSSLContext().createSSLEngine(aHostname, aPort);
-		sslEngine.setNeedClientAuth(false);
-		sslEngine.setUseClientMode(true);
-		sslEngine.beginHandshake();
-		hStatus = sslEngine.getHandshakeStatus();
+    /**
+     * Convert existing SocketChannelConnection into
+     * SSLSocketChannelConnection.
+     *
+     * @param aConnection Plain text socket channel connection.
+     * @param aContext    SSL Context, may be null to use default SSL context.
+     * @param aHostname   Host name.
+     * @param aPort       Port number.
+     * @throws javax.net.ssl.SSLException Exception in case we fail to start
+     *                                    an SSL handshake.
+     */
+    public SSLSocketChannelConnection(SocketChannelConnection aConnection, SSLContext aContext, String aHostname, int aPort) throws SSLException {
+        sChannel = aConnection.getSocketChannel();
 
-		appSendBuffer = ByteBuffer.allocate(sslEngine.getSession().getApplicationBufferSize());
-		cipherSendBuffer = ByteBuffer.allocate(sslEngine.getSession().getPacketBufferSize());
-		cipherRecvBuffer = ByteBuffer.allocate(sslEngine.getSession().getPacketBufferSize());
-		appRecvBuffer = ByteBuffer.allocate(sslEngine.getSession().getApplicationBufferSize());
-	}
+        sslEngine = aContext != null ? aContext.createSSLEngine(aHostname, aPort) : getDefaultSSLContext().createSSLEngine(aHostname, aPort);
+        sslEngine.setNeedClientAuth(false);
+        sslEngine.setUseClientMode(true);
+        sslEngine.beginHandshake();
+        hStatus = sslEngine.getHandshakeStatus();
 
-	@Override
-	public boolean open(String aHostname, int aPort, SSLContext aContext, Proxy aProxy, boolean resolveThroughProxy) throws IOException
-	{
-		sslEngine  = aContext != null ? aContext.createSSLEngine(aHostname, aPort) : getDefaultSSLContext().createSSLEngine(aHostname, aPort);			
-		sslEngine.setNeedClientAuth(false);
-		sslEngine.setUseClientMode(true);
-		sslEngine.beginHandshake();
-		hStatus = sslEngine.getHandshakeStatus();
+        appSendBuffer = ByteBuffer.allocate(sslEngine.getSession().getApplicationBufferSize());
+        cipherSendBuffer = ByteBuffer.allocate(sslEngine.getSession().getPacketBufferSize());
+        cipherRecvBuffer = ByteBuffer.allocate(sslEngine.getSession().getPacketBufferSize());
+        appRecvBuffer = ByteBuffer.allocate(sslEngine.getSession().getApplicationBufferSize());
+    }
 
-		appSendBuffer = ByteBuffer.allocate(sslEngine.getSession().getApplicationBufferSize());
-		cipherSendBuffer = ByteBuffer.allocate(sslEngine.getSession().getPacketBufferSize());
-		cipherRecvBuffer = ByteBuffer.allocate(sslEngine.getSession().getPacketBufferSize());
-		appRecvBuffer = ByteBuffer.allocate(sslEngine.getSession().getApplicationBufferSize());
+    @Override
+    public boolean open(String aHostname, int aPort, SSLContext aContext, Proxy aProxy, boolean resolveThroughProxy) throws IOException {
+        sslEngine = aContext != null ? aContext.createSSLEngine(aHostname, aPort) : getDefaultSSLContext().createSSLEngine(aHostname, aPort);
+        sslEngine.setNeedClientAuth(false);
+        sslEngine.setUseClientMode(true);
+        sslEngine.beginHandshake();
+        hStatus = sslEngine.getHandshakeStatus();
 
-		final InetSocketAddress address;
-		if (aProxy != null && aProxy.type() == Proxy.Type.SOCKS)
-		{
-			sChannel = new ProxiedSocketChannel(aProxy);
-			if (resolveThroughProxy)
-			{
-				address = InetSocketAddress.createUnresolved(aHostname, aPort);
-			}
-			else
-			{
-				address = new InetSocketAddress(aHostname, aPort);
-			}
-		}
-		else
-		{
-			// Configured to not use a proxy, using the original SocketChannel.
-			sChannel = SocketChannel.open();
-			address = new InetSocketAddress(aHostname, aPort);
-		}
-		return sChannel.connect(address);
-	}
+        appSendBuffer = ByteBuffer.allocate(sslEngine.getSession().getApplicationBufferSize());
+        cipherSendBuffer = ByteBuffer.allocate(sslEngine.getSession().getPacketBufferSize());
+        cipherRecvBuffer = ByteBuffer.allocate(sslEngine.getSession().getPacketBufferSize());
+        appRecvBuffer = ByteBuffer.allocate(sslEngine.getSession().getApplicationBufferSize());
 
-	@Override
-	public String read() throws IOException
-	{
-		doAnyPendingHandshake();
+        final InetSocketAddress address;
+        if (aProxy != null && aProxy.type() == Proxy.Type.SOCKS) {
+            sChannel = new ProxiedSocketChannel(aProxy);
+            if (resolveThroughProxy) {
+                address = InetSocketAddress.createUnresolved(aHostname, aPort);
+            } else {
+                address = new InetSocketAddress(aHostname, aPort);
+            }
+        } else {
+            // Configured to not use a proxy, using the original SocketChannel.
+            sChannel = SocketChannel.open();
+            address = new InetSocketAddress(aHostname, aPort);
+        }
+        return sChannel.connect(address);
+    }
 
-		if (!sslEngine.isInboundDone())
-		{
-			tryReadAndUnwrap();
-		}
-		else
-		{
-			throw new EndOfStreamException();
-		}
-		
-		byte[] _bytes = new byte[appRecvBuffer.flip().limit()];
-		appRecvBuffer.get(_bytes);
-		appRecvBuffer.clear();
-		
-		return new String(_bytes);
-	}
+    @Override
+    public String read() throws IOException {
+        doAnyPendingHandshake();
 
-	@Override
-	public int write(String aMessage) throws IOException
-	{
-		doAnyPendingHandshake();
+        if (!sslEngine.isInboundDone()) {
+            tryReadAndUnwrap();
+        } else {
+            throw new EndOfStreamException();
+        }
 
-		appSendBuffer.clear();
-		appSendBuffer.put(aMessage.getBytes()).flip();
-		
-		return wrapAndWrite();
-	}
+        byte[] _bytes = new byte[appRecvBuffer.flip().limit()];
+        appRecvBuffer.get(_bytes);
+        appRecvBuffer.clear();
 
-	@Override
-	public void close() throws IOException
-	{
-		try
-		{
-			if (sChannel.isConnected())
-			{
-				if (!sslEngine.isOutboundDone())
-				{
-					sslEngine.closeOutbound();
-					doAnyPendingHandshake();
-				}
-				else if (!sslEngine.isInboundDone())
-				{
-					sslEngine.closeInbound();
-					processHandshake();
-				}
-			}
-		}
-		catch (IOException aExc)
-		{
-			// Silently ignore.
-		}
-		finally
-		{
-			if (sChannel.isOpen())
-			{
-				sChannel.close();
-			}
-		}
-	}
+        return new String(_bytes);
+    }
 
-	
-	private synchronized void doAnyPendingHandshake() throws IOException
-	{
-		while (processHandshake())
-		{
+    @Override
+    public int write(String aMessage) throws IOException {
+        doAnyPendingHandshake();
 
-		}
-	}
-	
-	private synchronized boolean processHandshake() throws IOException
-	{
-		LOG.debug(Thread.currentThread().getName() + " " + hStatus);
-		switch (hStatus)
-		{
-			case NEED_WRAP:
-				wrapAndWrite();
-				break;
-			case NEED_UNWRAP:
-				if (!sslEngine.isInboundDone())
-				{
-					tryReadAndUnwrap();
-				}
-				else
-				{
-					return false;
-				}
-				break;
-			case NEED_TASK:
-				executeTasks();
-				break;
-			case NOT_HANDSHAKING:
-			case FINISHED:
-				return false;
-		}
+        appSendBuffer.clear();
+        appSendBuffer.put(aMessage.getBytes()).flip();
 
-		return true;
-	}
+        return wrapAndWrite();
+    }
 
-	private void tryReadAndUnwrap() throws IOException, SSLException
-	{
-		if (remaingUnwraps == 0)
-		{
-			cipherRecvBuffer.clear();
-			int _readCount = sChannel.read(cipherRecvBuffer);
-			if (_readCount == -1)
-			{
-				throw new EndOfStreamException();					
-			}
-			remaingUnwraps += _readCount;
-			LOG.debug("Reading: " + _readCount);
-			cipherRecvBuffer.flip();
-		}
+    @Override
+    public void close() throws IOException {
+        try {
+            if (sChannel.isConnected()) {
+                if (!sslEngine.isOutboundDone()) {
+                    sslEngine.closeOutbound();
+                    doAnyPendingHandshake();
+                } else if (!sslEngine.isInboundDone()) {
+                    sslEngine.closeInbound();
+                    processHandshake();
+                }
+            }
+        } catch (IOException aExc) {
+            // Silently ignore.
+        } finally {
+            if (sChannel.isOpen()) {
+                sChannel.close();
+            }
+        }
+    }
 
-		SSLEngineResult _hRes = sslEngine.unwrap(cipherRecvBuffer, appRecvBuffer);
-		hStatus = _hRes.getHandshakeStatus();			
-		remaingUnwraps -= _hRes.bytesConsumed();
-		
-		switch (_hRes.getStatus())
-		{
-			case BUFFER_UNDERFLOW:
-				int bytesRead = sChannel.read(cipherRecvBuffer.compact());
-				if (bytesRead == -1)
-				{
-					throw new EndOfStreamException();
-				}
-				remaingUnwraps += bytesRead;
-				cipherRecvBuffer.flip();					
-				break;
-			default:
-				break;				
-		}
-	}
+    private synchronized void doAnyPendingHandshake() throws IOException {
+        while (processHandshake()) {
+            // actual processing happens within processHandshake()
+        }
+    }
 
-	private int wrapAndWrite() throws SSLException, IOException
-	{
-		SSLEngineResult _hRes;
-		if (cipherSendBuffer.position() != 0)
-		{
-			cipherSendBuffer.compact();
-		}
-		_hRes = sslEngine.wrap(appSendBuffer, cipherSendBuffer);
-		hStatus = _hRes.getHandshakeStatus();
-		cipherSendBuffer.flip();
-		return sChannel.write(cipherSendBuffer);
-	}
+    private synchronized boolean processHandshake() throws IOException {
+        LOG.debug(Thread.currentThread().getName() + " " + hStatus);
+        switch (hStatus) {
+            case NEED_WRAP:
+                wrapAndWrite();
+                break;
+            case NEED_UNWRAP:
+                if (!sslEngine.isInboundDone()) {
+                    tryReadAndUnwrap();
+                } else {
+                    return false;
+                }
+                break;
+            case NEED_TASK:
+                executeTasks();
+                break;
+            case NOT_HANDSHAKING:
+            case FINISHED:
+                return false;
+        }
 
-	private void executeTasks()
-	{
-		Runnable _r;
-		while ((_r = sslEngine.getDelegatedTask()) != null)
-		{
-			new Thread(_r).start();
-		}
+        return true;
+    }
 
-		hStatus = sslEngine.getHandshakeStatus();
-	}
-	
-	@SuppressWarnings("UseSpecificCatch")
-	private SSLContext getDefaultSSLContext()
-	{
-		try
-		{
-			SSLContext _sslCtx = SSLContext.getInstance("SSL");
-			_sslCtx.init(null, new TrustManager[] { new X509TrustManager()
-			{
-				@Override
-				public java.security.cert.X509Certificate[] getAcceptedIssuers()
-				{
-					return null;
-				}
+    private void tryReadAndUnwrap() throws IOException, SSLException {
+        if (remaingUnwraps == 0) {
+            cipherRecvBuffer.clear();
+            int _readCount = sChannel.read(cipherRecvBuffer);
+            if (_readCount == -1) {
+                throw new EndOfStreamException();
+            }
+            remaingUnwraps += _readCount;
+            LOG.debug("Reading: " + _readCount);
+            cipherRecvBuffer.flip();
+        }
 
-				@Override
-				public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType)
-				{
-				}
+        SSLEngineResult _hRes = sslEngine.unwrap(cipherRecvBuffer, appRecvBuffer);
+        hStatus = _hRes.getHandshakeStatus();
+        remaingUnwraps -= _hRes.bytesConsumed();
 
-				@Override
-				public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType)
-				{
-				}
-			} }, new SecureRandom());
-			
-			return _sslCtx;
-		}
-		catch (Exception aExc)
-		{
-			throw new RuntimeException(aExc);
-		}
-	}
+        switch (_hRes.getStatus()) {
+            case BUFFER_UNDERFLOW:
+                int bytesRead = sChannel.read(cipherRecvBuffer.compact());
+                if (bytesRead == -1) {
+                    throw new EndOfStreamException();
+                }
+                remaingUnwraps += bytesRead;
+                cipherRecvBuffer.flip();
+                break;
+            default:
+                break;
+        }
+    }
+
+    private int wrapAndWrite() throws SSLException, IOException {
+        SSLEngineResult _hRes;
+        if (cipherSendBuffer.position() != 0) {
+            cipherSendBuffer.compact();
+        }
+        _hRes = sslEngine.wrap(appSendBuffer, cipherSendBuffer);
+        hStatus = _hRes.getHandshakeStatus();
+        cipherSendBuffer.flip();
+        return sChannel.write(cipherSendBuffer);
+    }
+
+    private void executeTasks() {
+        Runnable _r;
+        while ((_r = sslEngine.getDelegatedTask()) != null) {
+            new Thread(_r).start();
+        }
+
+        hStatus = sslEngine.getHandshakeStatus();
+    }
+
+    @SuppressWarnings("UseSpecificCatch")
+    private SSLContext getDefaultSSLContext() {
+        final SSLContext _sslCtx;
+        try {
+            _sslCtx = SSLContext.getInstance("SSL");
+            // FIXME default SSLContext is constructed very insecurely.
+            _sslCtx.init(null, new TrustManager[]{new X509TrustManager() {
+                @Override
+                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                    return null;
+                }
+
+                @Override
+                public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {
+                }
+
+                @Override
+                public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {
+                }
+            }}, new SecureRandom());
+            return _sslCtx;
+        } catch (final NoSuchAlgorithmException | KeyManagementException e) {
+            throw new IllegalStateException("Basic support for TLS missing. Failed to initialize SSLContext.", e);
+        }
+    }
 }

@@ -19,58 +19,58 @@ import com.ircclouds.irc.api.IRCApi;
 import com.ircclouds.irc.api.commands.CapCmd;
 import org.junit.Before;
 import org.junit.Test;
+
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
 /**
- *
  * @author danny
  */
 public class SaslNegotiatorTest {
 
-	public SaslNegotiatorTest() {
-	}
+    public SaslNegotiatorTest() {
+    }
 
-	@Before
-	public void setUp() {
-	}
+    @Before
+    public void setUp() {
+    }
 
-	@Test(expected = IllegalArgumentException.class)
-	@SuppressWarnings("ResultOfObjectAllocationIgnored")
-	public void testConstructNullUser() {
-		new SaslNegotiator(null, "password", "role");
-	}
+    @Test(expected = NullPointerException.class)
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
+    public void testConstructNullUser() {
+        new SaslNegotiator(null, "password", "role");
+    }
 
-	@Test(expected = IllegalArgumentException.class)
-	@SuppressWarnings("ResultOfObjectAllocationIgnored")
-	public void testConstructNullPassword() {
-		new SaslNegotiator("user", null, "role");
-	}
+    @Test(expected = NullPointerException.class)
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
+    public void testConstructNullPassword() {
+        new SaslNegotiator("user", null, "role");
+    }
 
-	@Test
-	@SuppressWarnings("ResultOfObjectAllocationIgnored")
-	public void testConstructNullRole() {
-		new SaslNegotiator("user", "password", null);
-	}
+    @Test
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
+    public void testConstructNullRole() {
+        new SaslNegotiator("user", "password", null);
+    }
 
-	@Test
-	@SuppressWarnings("ResultOfObjectAllocationIgnored")
-	public void testConstructWithAllParams() {
-		new SaslNegotiator("User", "pass", "role");
-	}
+    @Test
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
+    public void testConstructWithAllParams() {
+        new SaslNegotiator("User", "pass", "role");
+    }
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testInitiateNull() {
-		SaslNegotiator neg = new SaslNegotiator("user", "pass", "role");
-		neg.initiate(null);
-	}
+    @Test(expected = IllegalArgumentException.class)
+    public void testInitiateNull() {
+        SaslNegotiator neg = new SaslNegotiator("user", "pass", "role");
+        neg.initiate(null);
+    }
 
-	@Test
-	public void testInitiateValid() {
-		SaslNegotiator neg = new SaslNegotiator("user", "pass", "role");
-		IRCApi irc = mock(IRCApi.class);
-		CapCmd cmd = neg.initiate(irc);
-		assertNotNull(cmd);
-		assertEquals("CAP REQ :sasl", cmd.asString().trim());
-	}
+    @Test
+    public void testInitiateValid() {
+        SaslNegotiator neg = new SaslNegotiator("user", "pass", "role");
+        IRCApi irc = mock(IRCApi.class);
+        CapCmd cmd = neg.initiate(irc);
+        assertNotNull(cmd);
+        assertEquals("CAP REQ :sasl", cmd.asString().trim());
+    }
 }

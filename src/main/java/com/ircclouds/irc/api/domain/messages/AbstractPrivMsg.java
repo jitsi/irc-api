@@ -3,24 +3,20 @@ package com.ircclouds.irc.api.domain.messages;
 import com.ircclouds.irc.api.domain.*;
 import com.ircclouds.irc.api.domain.messages.interfaces.*;
 
-public abstract class AbstractPrivMsg implements IUserMessage, IHasText
-{
-	IRCUser fromUser;
-	String text;
+public abstract class AbstractPrivMsg implements IUserMessage, IHasText {
+    IRCUser fromUser;
+    String text;
 
-	public AbstractPrivMsg(IRCUser aFromUser, String aText)
-	{
-		fromUser = aFromUser;
-		text = aText;
-	}
-	
-	public IRCUser getSource()
-	{
-		return fromUser;
-	}
+    public AbstractPrivMsg(IRCUser aFromUser, String aText) {
+        fromUser = aFromUser;
+        text = aText;
+    }
 
-	public String getText()
-	{
-		return text;
-	}
+    public IRCUser getSource() {
+        return fromUser;
+    }
+
+    public String getText() {
+        return text;
+    }
 }

@@ -12,34 +12,29 @@ import com.ircclouds.irc.api.domain.messages.interfaces.ISource;
  *
  * @author Danny van Heumen
  */
-public class ClientErrorMessage implements IMessage
-{
-	private final Exception exception;
+public class ClientErrorMessage implements IMessage {
+    private final Exception exception;
 
-	public ClientErrorMessage(final Exception aExc)
-	{
-		this.exception = aExc;
-	}
+    public ClientErrorMessage(final Exception aExc) {
+        this.exception = aExc;
+    }
 
-	/**
-	 * This is a client error message, hence the source will be null.
-	 *
-	 * @return returns null
-	 */
-	@Override
-	public ISource getSource()
-	{
-		return null;
-	}
+    /**
+     * This is a client error message, hence the source will be null.
+     *
+     * @return returns null
+     */
+    @Override
+    public ISource getSource() {
+        return null;
+    }
 
-	@Override
-	public String asRaw()
-	{
-		return this.exception.toString();
-	}
+    @Override
+    public String asRaw() {
+        return this.exception.toString();
+    }
 
-	public Exception getException()
-	{
-		return this.exception;
-	}
+    public Exception getException() {
+        return this.exception;
+    }
 }
