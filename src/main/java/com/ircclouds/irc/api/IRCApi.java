@@ -24,6 +24,19 @@ import javax.net.ssl.SSLException;
  */
 @SuppressWarnings("unused")
 public interface IRCApi {
+
+    /**
+     * The (original) maximum message size for raw IRC messages. (This size represents the full payload size,
+     * terminating `\r\n` are excluded from this number and will be appended at transmission.)
+     */
+    int MAX_MESSAGE_SIZE = 510;
+
+    /**
+     * A slight safety margin, given that some IRC servers/relays cannot compute. (Freenode used to run a server that
+     * was off-by-one, resulting in incomplete messages that did satisfy the IRC message size criterium.)
+     */
+    int SAFETY_MARGIN = 3;
+
     /**
      * Asynchronous connect
      * <p>

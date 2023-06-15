@@ -27,6 +27,7 @@ import javax.net.ssl.SSLException;
  * @author miguel@lebane.se
  */
 public class IRCApiImpl implements IRCApi {
+
     private static final Logger LOG = LoggerFactory.getLogger(IRCApiImpl.class);
 
     private final IIRCSession session;
