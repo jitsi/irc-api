@@ -3,6 +3,8 @@ package com.ircclouds.irc.api;
 import com.ircclouds.irc.api.commands.*;
 import com.ircclouds.irc.api.listeners.*;
 
+import java.util.regex.Pattern;
+
 /**
  * IRC v3.1 capability negotiation.
  *
@@ -14,6 +16,9 @@ import com.ircclouds.irc.api.listeners.*;
  */
 public interface CapabilityNegotiator extends IMessageListener
 {
+	Pattern CAPABILITY_LS = Pattern.compile("\\sCAP\\s+([^\\s]+)\\s+LS\\s+:([\\w\\-_/.]+(?:\\s+[\\w\\-_/.]+)*)\\s*$", 0);
+	Pattern CAPABILITY_ACK = Pattern.compile("\\sCAP\\s+([^\\s]+)\\s+ACK\\s+:([\\w\\-_/.]+(?:\\s+[\\w\\-_/.]+)*)\\s*$", 0);
+	Pattern CAPABILITY_NAK = Pattern.compile("\\sCAP\\s+([^\\s]+)\\s+NAK");
 
 	/**
 	 * Initiate the negotiator with the provided irc instance.

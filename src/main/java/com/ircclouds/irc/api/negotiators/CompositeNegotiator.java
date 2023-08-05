@@ -37,10 +37,6 @@ public class CompositeNegotiator implements CapabilityNegotiator, IMessageListen
 	 */
 	private static final Logger LOG = LoggerFactory.getLogger(CompositeNegotiator.class);
 
-	private static final Pattern CAPABILITY_LS = Pattern.compile("\\sCAP\\s+([^\\s]+)\\s+LS\\s+:([\\w-_]+(?:\\s+[\\w-_]+)*)\\s*$", 0);
-	private static final Pattern CAPABILITY_ACK = Pattern.compile("\\sCAP\\s+([^\\s]+)\\s+ACK\\s+:([\\w-_]+(?:\\s+[\\w-_]+)*)\\s*$", 0);
-	private static final Pattern CAPABILITY_NAK = Pattern.compile("\\sCAP\\s+([^\\s]+)\\s+NAK");
-
 	/**
 	 * List of requested capabilities.
 	 */

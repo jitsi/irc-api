@@ -26,8 +26,6 @@ public class SaslNegotiator extends VariousMessageListenerAdapter implements Cap
 
 	private static final String SASL_CAPABILITY_ID = "sasl";
 
-	private static final Pattern CAPABILITY_ACK = Pattern.compile("\\sCAP\\s+([^\\s]+)\\s+ACK\\s+:([\\w-_]+(?:\\s+[\\w-_]+)*)\\s*$", 0);
-	private static final Pattern CAPABILITY_NAK = Pattern.compile("\\sCAP\\s+([^\\s]+)\\s+NAK");
 	private static final Pattern AUTHENTICATE_CONFIRMATION = Pattern.compile("AUTHENTICATE\\s+(\\+)\\s*$", 0);
 
 	// AUTHENTICATE numeric replies
